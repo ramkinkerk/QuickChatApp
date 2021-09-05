@@ -68,84 +68,84 @@ public class MessagesAdapter extends RecyclerView.Adapter {
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         Message message = messages.get(position);
 
-        int reactions[] = new int[]{
-                R.drawable.ic_fb_like,
-                R.drawable.ic_fb_love,
-                R.drawable.ic_fb_laugh,
-                R.drawable.ic_fb_wow,
-                R.drawable.ic_fb_sad,
-                R.drawable.ic_fb_angry
-        };
-
-        ReactionsConfig config = new ReactionsConfigBuilder(context)
-                .withReactions(reactions)
-                .build();
-
-        ReactionPopup popup = new ReactionPopup(context, config, (pos) -> {
-
-            if (holder.getClass() == SentViewHolder.class) {
-                SentViewHolder viewHolder = (SentViewHolder) holder;
-                viewHolder.binding.feeling.setImageResource(reactions[pos]);
-                viewHolder.binding.feeling.setVisibility(View.VISIBLE);
-            } else {
-                ReceiveViewHolder viewHolder = (ReceiveViewHolder) holder;
-                viewHolder.binding.feeling.setImageResource(reactions[pos]);
-                viewHolder.binding.feeling.setVisibility(View.VISIBLE);
-            }
-
-            message.setFeeling(pos);
-
-            FirebaseDatabase.getInstance().getReference()
-                    .child("chats")
-                    .child(senderRoom)
-                    .child("messages")
-                    .child(message.getMessageId()).setValue(message);
-
-            FirebaseDatabase.getInstance().getReference()
-                    .child("chats")
-                    .child(receiverRoom)
-                    .child("messages")
-                    .child(message.getMessageId()).setValue(message);
-
-            return true; // true is closing popup, false is requesting a new selection
-        });
+//        int[] reactions = new int[]{
+//                R.drawable.ic_fb_like,
+//                R.drawable.ic_fb_love,
+//                R.drawable.ic_fb_laugh,
+//                R.drawable.ic_fb_wow,
+//                R.drawable.ic_fb_sad,
+//                R.drawable.ic_fb_angry
+//        };
+//
+//        ReactionsConfig config = new ReactionsConfigBuilder(context)
+//                .withReactions(reactions)
+//                .build();
+//
+//        ReactionPopup popup = new ReactionPopup(context, config, (pos) -> {
+//
+//            if (holder.getClass() == SentViewHolder.class) {
+//                SentViewHolder viewHolder = (SentViewHolder) holder;
+//                viewHolder.binding.feeling.setImageResource(reactions[pos]);
+//                viewHolder.binding.feeling.setVisibility(View.VISIBLE);
+//            } else {
+//                ReceiveViewHolder viewHolder = (ReceiveViewHolder) holder;
+//                viewHolder.binding.feeling.setImageResource(reactions[pos]);
+//                viewHolder.binding.feeling.setVisibility(View.VISIBLE);
+//            }
+//
+//            message.setFeeling(pos);
+//
+//            FirebaseDatabase.getInstance().getReference()
+//                    .child("chats")
+//                    .child(senderRoom)
+//                    .child("messages")
+//                    .child(message.getMessageId()).setValue(message);
+//
+//            FirebaseDatabase.getInstance().getReference()
+//                    .child("chats")
+//                    .child(receiverRoom)
+//                    .child("messages")
+//                    .child(message.getMessageId()).setValue(message);
+//
+//            return true; // true is closing popup, false is requesting a new selection
+//        });
 
         if (holder.getClass() == SentViewHolder.class){
             SentViewHolder viewHolder = (SentViewHolder) holder;
             viewHolder.binding.message.setText(message.getMessage());
 
-            if (message.getFeeling() >= 0){
-                message.setFeeling(reactions[(int) message.getFeeling()]);
-                viewHolder.binding.feeling.setVisibility(View.VISIBLE);
-            }else {
-                viewHolder.binding.feeling.setVisibility(View.GONE);
-            }
-            viewHolder.binding.message.setOnTouchListener(new View.OnTouchListener() {
-                @Override
-                public boolean onTouch(View v, MotionEvent event) {
-                    popup.onTouch(v, event);
-                    return false;
-                }
-            });
+//            if (message.getFeeling() >= 0){
+//                message.setFeeling(reactions[ (int) message.getFeeling()]);
+//                viewHolder.binding.feeling.setVisibility(View.VISIBLE);
+//            }else {
+//                viewHolder.binding.feeling.setVisibility(View.GONE);
+//            }
+//            viewHolder.binding.message.setOnTouchListener(new View.OnTouchListener() {
+//                @Override
+//                public boolean onTouch(View v, MotionEvent event) {
+//                    popup.onTouch(v, event);
+//                    return false;
+//                }
+//            });
         } else {
             ReceiveViewHolder viewHolder = (ReceiveViewHolder) holder;
             viewHolder.binding.message.setText(message.getMessage());
 
-            if (message.getFeeling() >= 0){
-                //message.setFeeling(reactions[(int) message.getFeeling()]);
-                viewHolder.binding.feeling.setImageResource(reactions[message.getFeeling()]);
-                viewHolder.binding.feeling.setVisibility(View.VISIBLE);
-            }else {
-                viewHolder.binding.feeling.setVisibility(View.GONE);
-            }
-
-            viewHolder.binding.message.setOnTouchListener(new View.OnTouchListener() {
-                @Override
-                public boolean onTouch(View v, MotionEvent event) {
-                    popup.onTouch(v, event);
-                    return false;
-                }
-            });
+//            if (message.getFeeling() >= 0){
+//                //message.setFeeling(reactions[(int) message.getFeeling()]);
+//                viewHolder.binding.feeling.setImageResource(reactions[message.getFeeling()]);
+//                viewHolder.binding.feeling.setVisibility(View.VISIBLE);
+//            }else {
+//                viewHolder.binding.feeling.setVisibility(View.GONE);
+//            }
+//
+//            viewHolder.binding.message.setOnTouchListener(new View.OnTouchListener() {
+//                @Override
+//                public boolean onTouch(View v, MotionEvent event) {
+//                    popup.onTouch(v, event);
+//                    return false;
+//                }
+//            });
         }
     }
 
