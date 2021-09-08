@@ -25,6 +25,7 @@ import java.util.concurrent.TimeUnit;
 
 public class OTPActivity extends AppCompatActivity {
 
+
     ActivityOTPBinding binding;
     FirebaseAuth auth;
     String verificationId;
