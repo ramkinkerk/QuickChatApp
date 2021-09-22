@@ -3,7 +3,6 @@ package com.renox.quickchat.Adapter;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -11,12 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import com.github.pgreze.reactions.Reaction;
-import com.github.pgreze.reactions.ReactionPopup;
-import com.github.pgreze.reactions.ReactionsConfig;
-import com.github.pgreze.reactions.ReactionsConfigBuilder;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.google.firebase.database.FirebaseDatabase;
 import com.renox.quickchat.Model.Message;
 import com.renox.quickchat.R;
@@ -26,23 +20,18 @@ import com.renox.quickchat.databinding.ItemSendBinding;
 
 import java.util.ArrayList;
 
-public class MessagesAdapter extends RecyclerView.Adapter {
+public class GroupMessagesAdapter extends RecyclerView.Adapter {
 
     Context context;
     ArrayList<Message> messages;
     final int ITEM_SENT = 1;
     final  int ITEM_RECEIVED = 2;
 
-    String senderRoom;
-    String receiverRoom;
-    FirebaseRemoteConfig remoteConfig;
 
-    public MessagesAdapter(Context context, ArrayList<Message> messages, String senderRoom, String receiverRoom) {
-        remoteConfig = FirebaseRemoteConfig.getInstance();
+
+    public GroupMessagesAdapter(Context context, ArrayList<Message> messages) {
         this.context = context;
         this.messages = messages;
-        this.senderRoom = senderRoom;
-        this.receiverRoom = receiverRoom;
 
     }
     @NonNull
@@ -142,37 +131,25 @@ public class MessagesAdapter extends RecyclerView.Adapter {
 //                    return false;
 //                }
 //            });
-
             viewHolder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {
-                    View view = LayoutInflater.from(context).inflate(R.layout.delete_dialog, null);
+                    View view = LayoutInflater.from(context).inflate(R.layout.delete_dialog,null);
                     DeleteDialogBinding binding = DeleteDialogBinding.bind(view);
                     AlertDialog dialog = new AlertDialog.Builder(context)
                             .setTitle("Delete Message")
                             .setView(binding.getRoot())
                             .create();
-                    if (remoteConfig.getBoolean("isEveryoneDeletionEnabled")) {
-                        binding.everyone.setVisibility(View.VISIBLE);
-                    } else {
-                        binding.everyone.setVisibility(View.GONE);
-                    }
+
                     binding.everyone.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
                             message.setMessage("This message is removed.");
 //                            message.setFeeling(-1);
                             FirebaseDatabase.getInstance().getReference()
-                                    .child("chats")
-                                    .child(senderRoom)
-                                    .child("messages")
+                                    .child("public")
                                     .child(message.getMessageId()).setValue(message);
 
-                            FirebaseDatabase.getInstance().getReference()
-                                    .child("chats")
-                                    .child(receiverRoom)
-                                    .child("messages")
-                                    .child(message.getMessageId()).setValue(message);
                             dialog.dismiss();
                         }
                     });
@@ -180,14 +157,9 @@ public class MessagesAdapter extends RecyclerView.Adapter {
                     binding.delete.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-
                             FirebaseDatabase.getInstance().getReference()
-                                    .child("chats")
-                                    .child(senderRoom)
-                                    .child("messages")
+                                    .child("public")
                                     .child(message.getMessageId()).setValue(null);
-
-//                                    .setValue("The message is removed");
                             dialog.dismiss();
                         }
                     });
@@ -202,12 +174,10 @@ public class MessagesAdapter extends RecyclerView.Adapter {
                     dialog.show();
 
                     return false;
-
                 }
             });
         } else {
-            ReceiveViewHolder viewHolder = (ReceiveViewHolder)holder;
-
+            GroupMessagesAdapter.ReceiveViewHolder viewHolder = (GroupMessagesAdapter.ReceiveViewHolder) holder;
             if (message.getMessage().equals("photo")){
                 viewHolder.binding.image.setVisibility(View.VISIBLE);
                 viewHolder.binding.message.setVisibility(View.GONE);
@@ -247,15 +217,11 @@ public class MessagesAdapter extends RecyclerView.Adapter {
                             message.setMessage("This message is removed.");
                             message.setFeeling(-1);
                             FirebaseDatabase.getInstance().getReference()
-                                    .child("chats")
-                                    .child(senderRoom)
-                                    .child("messages")
+                                    .child("public")
                                     .child(message.getMessageId()).setValue(message);
 
                             FirebaseDatabase.getInstance().getReference()
-                                    .child("chats")
-                                    .child(receiverRoom)
-                                    .child("messages")
+                                    .child("public")
                                     .child(message.getMessageId()).setValue(message);
                             dialog.dismiss();
                         }
@@ -264,12 +230,9 @@ public class MessagesAdapter extends RecyclerView.Adapter {
                     binding.delete.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            message.setMessage("This message is removed.");
                             FirebaseDatabase.getInstance().getReference()
-                                    .child("chats")
-                                    .child(senderRoom)
-                                    .child("messages")
-                                    .child(message.getMessageId()).setValue(message);
+                                    .child("public")
+                                    .child(message.getMessageId()).setValue(null);
                             dialog.dismiss();
                         }
                     });
@@ -286,6 +249,7 @@ public class MessagesAdapter extends RecyclerView.Adapter {
                     return false;
                 }
             });
+
         }
     }
 

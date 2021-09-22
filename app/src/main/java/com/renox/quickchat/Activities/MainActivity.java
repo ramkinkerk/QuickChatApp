@@ -22,6 +22,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -54,12 +55,24 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+        database = FirebaseDatabase.getInstance();
 
         dialog = new ProgressDialog(this);
         dialog.setMessage("Uploading image..");
         dialog.setCancelable(false);
 
-        database = FirebaseDatabase.getInstance();
+        FirebaseMessaging.getInstance().getToken().addOnSuccessListener(new OnSuccessListener<String>() {
+            @Override
+            public void onSuccess(String token) {
+                HashMap<String, Object> map = new HashMap<>();
+                map.put("token", token);
+                database.getReference().child("users")
+                        .child(FirebaseAuth.getInstance().getUid())
+                        .updateChildren(map);
+            }
+        });
+
+
         users = new ArrayList<>();
         usersStatuses = new ArrayList<>();
 
@@ -222,15 +235,36 @@ public class MainActivity extends AppCompatActivity {
 
                 break;
             case R.id.groups:
-
+                startActivity(new Intent(MainActivity.this,GroupChatActivity.class));
                 break;
         }
         return super.onOptionsItemSelected(item);
     }
 
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.top_menu, menu);
         return super.onCreateOptionsMenu(menu);
+
     }
+
+
+
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        String currentId = FirebaseAuth.getInstance().getUid();
+        database.getReference().child("Active").child(currentId).setValue("Online");
+    }
+
+    @Override
+    protected void onPause() {
+        String currentId = FirebaseAuth.getInstance().getUid();
+        database.getReference().child("Active").child(currentId).setValue("Offline");
+        super.onPause();
+
+    }
+
 }
